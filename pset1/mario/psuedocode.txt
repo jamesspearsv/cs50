@@ -1,0 +1,7 @@
+prompt for height
+if height is < 1 or > 8
+	prompt for height again
+else 
+iterate from 1 to xHeight
+	print x number of hashs
+	go to new line 
