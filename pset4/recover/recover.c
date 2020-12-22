@@ -16,14 +16,13 @@ int main(int argc, char *argv[])
     int fileCounter = -0;
     bool jpgFound = false;
 
-    //Buffer, fileName, outFile
+    //Buffer, outFile, and fileName
     unsigned char buffer[512];
-    //char fileName[8]; -> file name in an array of chars
     FILE *img = NULL;
     char *fileName = malloc(8 * sizeof(char));
     if (fileName == NULL)
     {
-        return 2;
+        return 2; //Memory error
     }
 
     //Open card
@@ -34,7 +33,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    //Read 512 Bytes into buffer while blocks remain to be read
+    //Read 512 Bytes into buffer while not at end of file
     while (fread(buffer, 512, 1, input) != EOF)
     {
         //If start of new new JPEG
@@ -46,16 +45,8 @@ int main(int argc, char *argv[])
             //If second and so on JPEG
             if (jpgFound == true)
             {
-                //Close current img and free memory
+                //Close current open img
                 fclose(img);
-                free(fileName);
-
-                //Re-allocate memory for new file name
-                fileName = malloc(8 * sizeof(char));
-                if (fileName == NULL)
-                {
-                    return 2;
-                }
             }
 
             //If fisst JPEG of infile
