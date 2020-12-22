@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 
 int main(int argc, char *argv[])
@@ -13,7 +14,7 @@ int main(int argc, char *argv[])
 
     //Tracking variables
     int fileCounter = -0;
-    int jpgFound = 0; //False
+    bool jpgFound = false;
 
     //Buffer, fileName, outFile
     unsigned char buffer[512];
@@ -34,7 +35,7 @@ int main(int argc, char *argv[])
     }
 
     //Read 512 Bytes into buffer while blocks remain to be read
-    while (fread(buffer, 512, 1, input) == 1)
+    while (fread(buffer, 512, 1, input) != EOF)
     {
         //If start of new new JPEG
         if (buffer[0] == 0xff &&
@@ -43,7 +44,7 @@ int main(int argc, char *argv[])
             (buffer[3] & 0xf0) == 0xe0)
         {
             //If second and so on JPEG
-            if (jpgFound == 1)
+            if (jpgFound == true)
             {
                 //Close current img and free memory
                 fclose(img);
@@ -58,10 +59,10 @@ int main(int argc, char *argv[])
             }
 
             //If fisst JPEG of infile
-            if (jpgFound == 0)
+            if (jpgFound == false)
             {
                 //set jpgFound to 1
-                jpgFound = 1;
+                jpgFound = true;
             }
 
             //Name, open, and write to new jpg file
@@ -72,7 +73,7 @@ int main(int argc, char *argv[])
         }
 
         //if block is not start of JPEG
-        else if (jpgFound == 1)
+        else if (jpgFound == true)
         {
             //Write to current open jpg file
             fwrite(buffer, 512, 1, img);
