@@ -18,8 +18,12 @@ int main(int argc, char *argv[])
     //Buffer, fileName, outFile
     unsigned char buffer[512];
     //char fileName[8]; -> file name in an array of chars
-    char *fileName = malloc(8 * sizeof(char));
     FILE *img = NULL;
+    char *fileName = malloc(8 * sizeof(char));
+    if (fileName == NULL)
+    {
+        return 2;
+    }
 
     //Open card
     FILE *input = fopen(argv[1], "r");
@@ -47,6 +51,10 @@ int main(int argc, char *argv[])
 
                 //Re-allocate memory for new file name
                 fileName = malloc(8 * sizeof(char));
+                if (fileName == NULL)
+                {
+                    return 2;
+                }
             }
 
             //If fisst JPEG of infile
