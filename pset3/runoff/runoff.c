@@ -144,11 +144,11 @@ bool vote(int voter, int rank, string name)
 // Tabulate votes for non-eliminated candidates
 void tabulate(void)
 {
-    //Right now, this loop doesn't stop
-    //when a vote is counted for the highest ranked
-    //candidates. It counts all votes for all ranks.
+    //Iterates through voters
     for (int i = 0; i < voter_count; i++)
     {
+        //Iterates through voter preferences until
+        //non-eliminated candidate is found
         for (int j = 0; j < candidate_count; j++)
         {
             int temp = preferences[i][j];

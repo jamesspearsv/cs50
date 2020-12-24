@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
     }
 
     //Tracking variables
-    int fileCounter = -0;
+    int fileCounter = 0;
     bool jpgFound = false;
 
     //Buffer, outFile, and fileName
