@@ -87,7 +87,7 @@ node* createNode(char* string, node *newNode)
         exit(1);
     } 
 
-    strcpy(newNode->data, string);
+    strcpy(newNode->data, string); //Segmentation fault here
     newNode->next = NULL;
 
     return newNode;
