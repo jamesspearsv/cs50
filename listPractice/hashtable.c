@@ -3,8 +3,10 @@
 #include <stdbool.h>
 #include <string.h>
 #include <strings.h>
+#include <ctype.h>
 
-#define LENGTH 14
+#define LENGTH 15 //Max word length
+#define TABLESIZE 31 //Table length
 
 typedef struct node
 {
@@ -13,10 +15,11 @@ typedef struct node
 } node;
 
 //Function prototypes
+int hash(char *string);
 node* createNode(char *data, node *newNode);
 node* preprendNode(node *head, node* n);
 void printList(node *head);
-bool searchList (node* head, char *data);
+bool searchTable (node* head, char *data);
 void freeList(node *head);
 
 int main(int argc, char *argv[])
@@ -34,34 +37,49 @@ int main(int argc, char *argv[])
         return 2;
     }
 
-    node *head = NULL;
-    node *n = NULL;
+    //Create table and head prointers
+    node *hashTable[TABLESIZE];
+    for (int i = 0; i < TABLESIZE; i++)
+    {
+        //Set head pointer to NULL for each table index
+        hashTable[i] = NULL;
+    }
+    node *n = NULL; //Temp pointer
+    
 
+    //Read data from infile and create table
     char string[LENGTH + 1];
-
     while(fscanf(file, "%s", string) != EOF)
     {
+        int hashKey = hash(string);
         n = createNode(string, n);
-        head = preprendNode(head, n);
+        hashTable[hashKey] = preprendNode(hashTable[hashKey], n);
     }
 
-    //printList(head);
+    /*printf("***START***\n");
+    for (int i = 0; i < TABLESIZE; i++)
+    {
+        printf("\n\n***INDEX %i***\n", i);
+        printList(hashTable[i]);
+    }
+    printf("***END***"); */
 
-
+    //Search table with user input
     char searchVal[LENGTH + 1];
-    char *exitVal = "exit";
+    char *exitVal = "/exit";
     while (strcasecmp(searchVal, exitVal) != 0)
     {
-        printf("Type 'exit' to quit\n");
+        printf("Type '/exit' to quit\n");
         printf("What word are you looking for: ");
         scanf("%s", searchVal);
+        int searchKey = hash(searchVal);
 
-        if (strcasecmp(searchVal, exitVal) == 0)
+        if (strcmp(searchVal, exitVal) == 0)
         {
             printf("\nThank you!\n");
             break;
         }
-        else if (searchList(head, searchVal) == true)
+        else if (searchTable(hashTable[searchKey], searchVal) == true)
         {
             printf("%s is in the list!\n", searchVal);
         }
@@ -72,20 +90,38 @@ int main(int argc, char *argv[])
 
         printf("\n***************\n");
     }
-    freeList(head);
 
+    //Free list at each table index
+    for (int i = 0; i < TABLESIZE; i++)
+    {
+        freeList(hashTable[i]);
+    }
     return 0;
 }
 
 
 //Fuction definitions
+int hash(char *string)
+{
+    int sum = 0;
+    int n = strlen(string);
+
+    for (int i = 0; i < n; i++)
+    {
+        int tmp = tolower(string[i]);
+        sum = sum + (tmp * tmp);
+    }
+    sum = sum % TABLESIZE;
+    return sum;
+}
+
 node* createNode(char* string, node *newNode)
 {
     newNode = (node*)malloc(sizeof(node));
     if (newNode == NULL)
     {
         printf("Memory error creating node\n");
-        exit(1);
+        exit(3);
     } 
 
     strcpy(newNode->data, string);
@@ -94,35 +130,39 @@ node* createNode(char* string, node *newNode)
     return newNode;
 }
 
-node* preprendNode(node *head, node* n)
+//Push new node to front of list
+node* preprendNode(node *head, node* nodeToPrepend)
 {
     if (head == NULL)
     {
-        head = n;
+        head = nodeToPrepend;
     }
     else 
     {
-        n->next = head;
-        head = n;
+        nodeToPrepend->next = head;
+        head = nodeToPrepend;
     }
 
     return head;
 }
 
+//Prints linked list with given head pointePre
 void printList(node *head)
 {
     node *cursor = head;
+    if (cursor == NULL) printf("NULL\n");
 
-    printf("***START***\n");
+    //printf("***START***\n");
     while(cursor != NULL)
     {
         printf("%s\n", cursor->data);
         cursor = cursor->next;
     }
-    printf("***END***\n");
+    //printf("***END***\n");
 }
 
-bool searchList (node *head, char *string)
+//Searched linked like with given head pointer and search value
+bool searchTable (node *head, char *string)
 {
     node *cursor = head;
     while (cursor != NULL)
@@ -136,6 +176,7 @@ bool searchList (node *head, char *string)
     return false;
 }
 
+//Frees list with given head pointer
 void freeList(node *head)
 {
     while (head != NULL)
