@@ -55,6 +55,7 @@ int main(int argc, char *argv[])
         n = createNode(string, n);
         hashTable[hashKey] = preprendNode(hashTable[hashKey], n);
     }
+    fclose(file);
 
     /*printf("***START***\n");
     for (int i = 0; i < TABLESIZE; i++)
