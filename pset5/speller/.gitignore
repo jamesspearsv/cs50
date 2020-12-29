@@ -1,0 +1,8 @@
+# *.txt files
+/texts
+
+# answer keys
+/keys
+
+# dictionary files
+/dictionaries

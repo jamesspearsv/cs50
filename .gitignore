@@ -1,2 +1,6 @@
 #Ignore Mac system files
 .DS_Store
+
+#VS Code system specific files
+/listPractice/.vscode
+*.dSYM

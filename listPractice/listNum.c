@@ -1,22 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <string.h>
-#include <strings.h>
-
-#define LENGTH 14
 
 typedef struct node
 {
-    char data[LENGTH + 1];
+    int data;
     struct node *next;  
 } node;
 
 //Function prototypes
-node* createNode(char *data, node *newNode);
+node* createNode(int val, node *newNode);
 node* preprendNode(node *head, node* n);
 void printList(node *head);
-bool searchList (node* head, char *data);
+bool searchList (node* head, int val);
 void freeList(node *head);
 
 int main(int argc, char *argv[])
@@ -37,41 +33,39 @@ int main(int argc, char *argv[])
     node *head = NULL;
     node *n = NULL;
 
-    char string[LENGTH + 1];
+    int val;
 
-    while(fscanf(file, "%s", string) != EOF)
+    while(fscanf(file, "%i", &val) != EOF)
     {
-        n = createNode(string, n);
+        n = createNode(val, n);
         head = preprendNode(head, n);
     }
 
-    //printList(head);
-
-
-    char searchVal[LENGTH + 1];
-    char *exitVal = "exit";
-    while (strcasecmp(searchVal, exitVal) != 0)
+    int searchVal = 0;
+    int exitVal = -1;
+    while (searchVal != exitVal)
     {
-        printf("Type 'exit' to quit\n");
-        printf("What word are you looking for: ");
-        scanf("%s", searchVal);
-
-        if (strcasecmp(searchVal, exitVal) == 0)
+        printf("Which numer are you looking for?\nType '-1' to quit\n");
+        scanf("%i", &searchVal);
+    
+        if (searchVal == exitVal) 
         {
-            printf("\nThank you!\n");
+            printf("Thank you!\n");
             break;
         }
-        else if (searchList(head, searchVal) == true)
+        else if (searchList(head, searchVal))
         {
-            printf("%s is in the list!\n", searchVal);
+            printf("%i is in the list!\n", searchVal);
         }
         else
         {
-            printf("%s is not in the list.\n", searchVal);
+            printf("%i is not in the list.\n", searchVal);
         }
 
-        printf("\n***************\n");
+        printf("**********************************************\n");
+        printf("**********************************************\n");
     }
+
     freeList(head);
 
     return 0;
@@ -79,7 +73,7 @@ int main(int argc, char *argv[])
 
 
 //Fuction definitions
-node* createNode(char* string, node *newNode)
+node* createNode(int val, node *newNode)
 {
     newNode = (node*)malloc(sizeof(node));
     if (newNode == NULL)
@@ -88,7 +82,7 @@ node* createNode(char* string, node *newNode)
         exit(1);
     } 
 
-    strcpy(newNode->data, string);
+    newNode->data = val;
     newNode->next = NULL;
 
     return newNode;
@@ -116,21 +110,22 @@ void printList(node *head)
     printf("***START***\n");
     while(cursor != NULL)
     {
-        printf("%s\n", cursor->data);
+        printf("%i\n", cursor->data);
         cursor = cursor->next;
     }
-    printf("***END***\n");
+    printf("\n***END***\n");
 }
 
-bool searchList (node *head, char *string)
+bool searchList (node* head, int val)
 {
-    node *cursor = head;
+    node* cursor = head;
     while (cursor != NULL)
     {
-        if (strcasecmp(cursor->data, string) == 0)
+        if (cursor->data == val)
         {
             return true;
         }
+
         cursor = cursor->next;
     }
     return false;
