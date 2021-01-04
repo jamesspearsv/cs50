@@ -4,3 +4,6 @@
 #VS Code system specific files
 /listPractice/.vscode
 *.dSYM
+
+#Database files --> Too large for GitHub
+*.db
