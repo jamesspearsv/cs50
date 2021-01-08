@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
+        <link href="styles.css" rel="stylesheet">
+        <title>Trivia!</title>
+
+        <script>
+
+            document.addEventListener('DOMContentLoaded', () => {
+                // Correct anwsers
+                let correct = document.querySelectorAll('.correct');
+                for (let i = 0; i < correct.length; i++) {
+                    correct[i].addEventListener('click', () =>{
+                        correct[i].style.color = 'white';
+                        correct[i].style.backgroundColor = 'green';
+
+                        document.getElementById('feedback1').innerHTML = 'Correct answer!'
+                    });
+                };
+
+                // Incorrect answers
+                let incorrect = document.querySelectorAll('.incorrect');
+                for (let i = 0; i < incorrect.length; i++) {
+                    incorrect[i].addEventListener('click', () =>{
+                        incorrect[i].style.color = 'white';
+                        incorrect[i].style.backgroundColor = 'red';
+
+                        document.getElementById('feedback1').innerHTML = 'Incorrect answer.'
+                    });
+                };
+
+                // Checks answer to section2
+                let form = document.querySelector('form');
+                const ANSWER = 'william henry harrison';
+                form.addEventListener('submit', () => {
+                    let  input = document.querySelector('input');
+                    if (input.value.toLowerCase().includes(ANSWER)) {
+                        document.getElementById('feedback2').innerHTML = 'Correct answer!';
+                        input.style.backgroundColor = 'green';
+                        input.style.color = 'white';
+                    }
+                    else {
+                        document.getElementById('feedback2').innerHTML = 'Incorrect answer. Check your spelling.'
+                        input.style.backgroundColor = 'red';
+                        input.style.color = 'white';
+                    }
+                });
+            });
+
+
+
+        </script>
+
+    </head>
+    <body>
+
+        <div class="jumbotron">
+            <h1>Trivia!</h1>
+        </div>
+
+        <div class="container">
+
+            <div class="section">
+                <h2>Part 1: Multiple Choice </h2>
+                <hr>
+                <ol>
+                    <li>
+                        <h3>Who was the second Vice President of the United States?</h3>
+                        <button class="incorrect">Alexander Hamilton</button>
+                        <button class="correct">Thomas Jefferson</button>
+                        <button class="incorrect">Aaron Burr</button>
+                        <button class="incorrect">George Clinton</button>
+                        <button class="incorrect">John Adams</button>
+                    </li>
+                    <li>
+                        <h3>Which Founding Father Mrote the decleration of Independence?</h3>
+                        <button class="incorrect">Geroge Washington</button>
+                        <button class="incorrect">Benjamin Franklin</button>
+                        <button class="correct">Thomas Jefferson</button>
+                        <button class="incorrect">George Pickney</button>
+                        <button class="incorrect">James Madison</button>
+                    </li>
+                </ol>
+
+                <p id="feedback1"></p>
+            </div>
+
+            <div class="section">
+                <h2>Part 2: Free Response</h2>
+                <hr>
+
+                <h3>Which American president has served the shortest term in office at only 31 days?</h3>
+
+                <form onsubmit="return false;">
+                    <input id ="answer" type="text" autocomplete="off">
+                    <button type="submit">Submit Answer</button>
+                </form>
+
+                <p id="feedback2"></p>
+            </div>
+        </div>
+    </body>
+</html>
