@@ -8,6 +8,7 @@
         <link href="styles/styles.css" rel="stylesheet">
         <link href="styles/contact.css" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet"> 
+        <script src="scripts/email.js"></script>
         <title>James Spears, V | Contact</title>
     </head>
     <body>
@@ -25,7 +26,7 @@
                     <a class="nav-link" href="contact.html">Contact</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="mywork.html">My Work</a>
+                    <a class="nav-link" href="blog.html">Blog</a>
                 </li>
             </ul>
         </nav>
@@ -44,12 +45,23 @@
                 <a href="https://github.com/jamesspearsv"><img class="social-logo" src="assets/img/github.svg"></a>
                 <a href="https://www.facebook.com/james.spears99"><img class="social-logo" src="assets/img/facebook.svg"></a>
             </div>
-            <form class="email-form">
-                <label for="email" id="email-label">Enter your email:</label>
-                <input type="email" name="email" id="email" class="form-control" placeholder="Email Address">
-                <label for="message" id="message-label">Message:</label>
-                <textarea id="message" class="form-control" name="message" rows="5" cols="25" placeholder="Type Here"></textarea>
-                <input type="submit" id="submit" value="Send Message" class="btn btn-primary">
+            <form class="email-form" id="email-form" action="https://formspree.io/f/mrgorajo" method="POST">
+                <div class="form-item">
+                    <label for="name" id="name-label">Enter your name:</label>
+                    <input type="text" name="name" id="name" class="form-control" placeholder="Name">
+                </div>
+                <div class="form-item">
+                    <label for="email" id="email-label">Enter your email:</label>
+                    <input type="email" name="email" id="email" class="form-control" placeholder="Email Address">
+                </div>
+                <div class="form-item">
+                    <label for="message" id="message-label">Message:</label>
+                    <textarea id="message" class="form-control" name="message" rows="10" cols="25" placeholder="Type Here"></textarea>
+                </div>
+                <div class="form-item">
+                    <button type="submit" id="submit" class="btn btn-primary">Send Message!</button>
+                    <div id="status-banner"></div>
+                </div>
             </form>
         </main>
 

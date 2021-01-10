@@ -13,21 +13,20 @@ main {
 }
 
 .email-form {
-    display: grid;
-    grid-template-columns: auto auto;
-    gap: 5%;
+    display: flex;
+    flex-direction: column;
 }
 
-#email-label, #message-label {
-    margin-right: auto;
+.form-item {
+    margin-top: 2%;
 }
 
-#submit {
-    grid-column: 2 / 3;
+#status-banner {
+    margin-top: 3%;
 }
 
 .social-logo {
-    height: 20%;
-    width: auto;
+    height: 50px;
+    width: 50px;
     margin: 2%;
 }
