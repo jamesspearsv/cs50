@@ -1,0 +1,16 @@
+/* Content layout */
+.grid-container {
+    display: grid;
+    grid-template-columns: auto auto;
+    margin-top: 10%;
+    allign-content: center; 
+}
+
+.headshot {
+    border-radius: 25%;
+}
+
+.bio {
+    text-align: center;
+    padding: 2em;
+}

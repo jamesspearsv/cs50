@@ -1,0 +1,26 @@
+/* GLOBAL SITE ELEMENTS */
+
+/* navigation bar and items */
+nav {
+    background-color: #555555;
+    padding: 0;
+}
+
+.nav-link, .navbar-brand {
+    color: #ffffff;
+}
+
+/* Footer and footer content */
+footer {
+    position: fixed;
+    bottom: 0;
+    background-color: #555555;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.footerItem {
+    color: #ffffff;
+    text-align: center;
+    margin: 10px;
+}
