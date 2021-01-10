@@ -6,29 +6,52 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
         
         <link href="styles/styles.css" rel="stylesheet">
+        <link href="styles/contact.css" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet"> 
         <title>James Spears, V | Contact</title>
     </head>
     <body>
         <!-- NavBar: Global site element-->
-        <div>
-            <nav class="navbar navbar-expand-md navbar-dark">
-                <a class="navbar-brand" href="index.html">James Spears, V</a>
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="index.html">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="aboutme.html">About Me</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="contact.html">Contact</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">#</a>
-                    </li>
-                </ul>
-            </nav>
-        </div>
+        <nav class="navbar navbar-expand-md navbar-dark">
+            <a class="navbar-brand" href="index.html">James Spears, V</a>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="aboutme.html">About Me</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="contact.html">Contact</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="mywork.html">My Work</a>
+                </li>
+            </ul>
+        </nav>
+
+        <main class="container grid-container">
+            <div class="content">
+                <h2>Get In Touch</h2>
+                <p>
+                If you'd like to get in touch with me fill out the form 
+                and send me a message! 
+                </p>
+                <p>
+                Or connect with me on social media and GitHub!    
+                </p>
+                <a href="https://twitter.com/jspearsv"><img class="social-logo" src="assets/img/twitter.svg"></a>
+                <a href="https://github.com/jamesspearsv"><img class="social-logo" src="assets/img/github.svg"></a>
+                <a href="https://www.facebook.com/james.spears99"><img class="social-logo" src="assets/img/facebook.svg"></a>
+            </div>
+            <form class="email-form">
+                <label for="email" id="email-label">Enter your email:</label>
+                <input type="email" name="email" id="email" class="form-control" placeholder="Email Address">
+                <label for="message" id="message-label">Message:</label>
+                <textarea id="message" class="form-control" name="message" rows="5" cols="25" placeholder="Type Here"></textarea>
+                <input type="submit" id="submit" value="Send Message" class="btn btn-primary">
+            </form>
+        </main>
 
         <!-- Footer: Global site element-->
         <footer class="container-fluid">    

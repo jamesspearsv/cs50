@@ -1,0 +1,33 @@
+main {
+    text-align: center;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: auto auto;
+    margin-top: 10%;
+}
+
+.content {
+    margin-right: 5%;
+}
+
+.email-form {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 5%;
+}
+
+#email-label, #message-label {
+    margin-right: auto;
+}
+
+#submit {
+    grid-column: 2 / 3;
+}
+
+.social-logo {
+    height: 20%;
+    width: auto;
+    margin: 2%;
+}

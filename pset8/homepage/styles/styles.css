@@ -1,5 +1,9 @@
 /* GLOBAL SITE ELEMENTS */
 
+body {
+    font-family: 'Source Sans Pro', sans-serif;
+    font-size: large;
+}
 /* navigation bar and items */
 nav {
     background-color: #555555;
@@ -8,6 +12,10 @@ nav {
 
 .nav-link, .navbar-brand {
     color: #ffffff;
+}
+
+.nav-link:hover, .navbar-brand:hover {
+    text-decoration: underline;
 }
 
 /* Footer and footer content */
@@ -23,4 +31,5 @@ footer {
     color: #ffffff;
     text-align: center;
     margin: 10px;
+    font-size: medium;
 }
