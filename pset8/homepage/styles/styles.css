@@ -3,6 +3,7 @@
 body {
     font-family: 'Source Sans Pro', sans-serif;
     font-size: large;
+    text-align: center;
 }
 /* navigation bar and items */
 nav {

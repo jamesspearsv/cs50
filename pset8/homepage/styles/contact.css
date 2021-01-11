@@ -5,7 +5,7 @@ main {
 .grid-container {
     display: grid;
     grid-template-columns: auto auto;
-    margin-top: 10%;
+    margin-top: 5%;
 }
 
 .content {

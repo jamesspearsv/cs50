@@ -1,0 +1,14 @@
+main {
+    display: grid;
+    grid-template-columns: 10% 80% 10%;
+}
+
+.main-div {
+    grid-column: 2/3;
+    margin-top: 10%;
+}
+
+.main-content {
+    margin: 3%;
+}
+
