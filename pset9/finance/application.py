@@ -93,6 +93,10 @@ def buy():
         print(f"shares: {shares}")
         print(f"datetime: {date}")
 
+        """TODO: Finish collection necessary data and insert into databse"""
+        """TODO: Need new table to record transaction history"""
+        """TODO: Link all tables to session["user_id"]"""
+
         return apology("TODO")
     else:
         return render_template("buy.html")
