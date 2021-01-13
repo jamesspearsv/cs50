@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Quote
+{% endblock %}
+
+
+
+{% block main %}
+    <h2>{{ name }} ({{ symbol }})</h2>
+    <div class="stock-quote">
+        <p>A share of {{ name }} ({{ symbol }}) costs {{ price }} .</p>
+    </div>
+
+    <button class="btn btn-primary"><a class="buy-btn-lnk" href="/buy">Buy</a></button>
+{% endblock %}

@@ -1,0 +1,6 @@
+# configure flask run
+export FLASK_APP=<script.py>
+export FLASK_DEBUG=1
+
+# API key
+export API_KEY=<key>
