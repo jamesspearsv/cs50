@@ -4,3 +4,7 @@ export FLASK_DEBUG=1
 
 # API key
 export API_KEY=<key>
+
+
+# History SQL query
+SELECT ledger.id, ledger.symbol, stock_name, shares, transaction_type, datetime FROM ledger JOIN portfolio ON portfolio.symbol = ledger.symbol WHERE ledger.user_id=1 ORDER BY ledger.id DESC;

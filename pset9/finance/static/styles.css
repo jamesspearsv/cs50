@@ -73,23 +73,29 @@ main img
     flex: 1;
 }
 
-.buy-btn-lnk {
+.buy-btn-lnk,
+.sell-btn-lnk {
     color: #ffffff;
     text-decoration: none;
 }
 
-.buy-btn-lnk:hover {
+.buy-btn-lnk:hover,
+.sell-btn-lnk:hover {
     color: #ffffff;
     text-decoration: none;
 }
 
-.buy-form {
+.buy-form, 
+.sell-form {
     display: flex;
     flex-direction: column;
     width: 25%;
     margin: auto;
 }
 
-.buy-form input, .buy-form button {
+.buy-form input, 
+.buy-form button, 
+.sell-form input, 
+.sell-form button {
     margin-top: 3%;
 }

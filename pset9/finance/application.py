@@ -50,25 +50,24 @@ try:
     db.execute("""CREATE TABLE portfolio (
                 symbol TEXT NOT NULL,
                 stock_name TEXT NOT NULL,
-                total_shares INTEGER,
-                user_id INTEGER,
-                PRIMARY KEY(symbol),
+                total_shares INTEGER NOT NULL,
+                user_id INTEGER NOT NULL,
+                PRIMARY KEY(symbol, user_id),
                 FOREIGN KEY(user_id) REFERENCES users(id));""")
-    db.execute("CREATE UNIQUE INDEX symbol ON portfolio(symbol);")
     db.execute("""CREATE TABLE ledger (
                 id INTEGER,
                 symbol TEXT NOT NULL,
                 transaction_type TEXT NOT NULL,
                 price NUMERIC NOT NULL,
-                shares INTEGER,
+                shares INTEGER NOT NULL,
                 datetime TEXT NOT NULL,
                 user_id INTEGER,
                 PRIMARY KEY(id),
-                FOREIGN KEY(symbol) REFERENCES portfolio(symbol),
+                FOREIGN KEY(symbol, user_id) REFERENCES portfolio(symbol, user_id),
                 FOREIGN KEY(user_id) REFERENCES users(id));""")
     db.commit()
 except:
-    db.commit()
+    pass
 
 # Make sure API key is set
 if not os.environ.get("API_KEY"):
@@ -107,26 +106,28 @@ def buy():
         user_funds = temp[0][0]
 
         # Check that user has funds to make purchase
-        if user_funds < cost:
-            return apology("Insufficient funds")
+        if cost > user_funds:
+            return apology("Insufficient funds", 403)
                 
-        # Insert transaction into ledger. TODO factor this out into function (helpers.py). Used later in sell route.
+
+        # Update users cash account balance and portfolio
+        # Check is user does not already own desired stock
+        rows = cursor.execute("SELECT * from portfolio WHERE user_id=? AND symbol=?;", (user, symbol)).fetchall()
+        if len(rows) == 0:
+            db.execute("INSERT INTO portfolio (symbol, stock_name, total_shares, user_id) VALUES(?, ?, ?, ?);", (symbol, name, shares, user))
+            db.execute("UPDATE users SET cash=cash - ? WHERE id=?;", (cost, user))
+            db.commit()
+        else:
+            db.execute("UPDATE portfolio SET total_shares=total_shares + ? WHERE user_id=? AND symbol=?;", (shares, user, symbol))
+            db.execute("UPDATE users SET cash=cash - ? WHERE id=?;", (cost, user))
+            db.commit()
+
+        # Insert transaction into ledger. 
         db.execute("""INSERT INTO ledger (symbol, transaction_type, price, shares, datetime, user_id) 
         VALUES (?, ?, ?, ?, ?, ?);""", (symbol, transaction_type, price, shares, date, user))
         db.commit()
 
-        # Update users cash account balance and total owned shares.
-        # Check is user does not already has desired stock
-        rows = cursor.execute("SELECT * from portfolio WHERE user_id=? AND symbol=?;", (user, symbol)).fetchall()
-        if len(rows) == 0:
-            db.execute("INSERT INTO portfolio (symbol, stock_name, total_shares, user_id) VALUES(?, ?, ?, ?);", (symbol, name, shares, user))
-            db.execute("UPDATE users SET cash=? WHERE id=?;", ((user_funds - cost), user))
-            db.commit()
-            return redirect("/")
-        # If user already has desired stock. TODO update cash balance and total owned shares. 
-        # Maybe factor this out into function (helpers.py) too. Similar action in sell route.
-        else: 
-            return apology("TODO: ELSE")
+        return redirect("/")
     # GET requests to route
     else: 
         return render_template("buy.html")
@@ -222,7 +223,7 @@ def register():
             return apology("Passwords do not match", 403)
         # Check username is available
         rows = cursor.execute("SELECT username FROM users WHERE username=?;", (username,)).fetchall()
-        if len(rows) >= 1:
+        if len(rows) != 0:
             return apology("Username taken")
 
         hashword = generate_password_hash(password)
@@ -240,7 +241,53 @@ def register():
 @login_required
 def sell():
     """Sell shares of stock"""
-    return apology("TODO")
+    if request.method == "POST":
+        transaction_type = "sell"
+
+        # Get lookup information
+        quote = lookup(request.form.get("symbol"))
+        if quote==None:
+            return apology("Looks like nothing was found", 404)
+
+        # Store necessary information in variables
+        shares = request.form.get("shares")
+        name = quote["name"]
+        price = quote["price"]
+        symbol = quote["symbol"]
+        date = datetime.utcnow()
+        user = session["user_id"]
+        cost = price * float(shares)
+
+        temp = cursor.execute("SELECT total_shares FROM portfolio WHERE user_id=? AND symbol=?;", (user, symbol)).fetchall()
+        user_shares = temp[0][0]
+
+        # Check that user has enough shares to make the sale
+        if int(shares) > user_shares:
+            return apology("Insufficient funds", 403)
+                
+
+        # Update users cash account balance and portfolio
+        # If user already owns desired stock.
+        db.execute("UPDATE portfolio SET total_shares=total_shares - ? WHERE user_id=? AND symbol=?;", (shares, user, symbol))
+        db.execute("UPDATE users SET cash=cash + ? WHERE id=?;", (cost, user))
+
+        # Check that user has shares remaining after sale. If not, delete row.
+        rows = db.execute("SELECT total_shares FROM portfolio WHERE symbol=? AND user_id=?;", (symbol, user)).fetchall()
+        if int(rows[0][0]) == 0:
+            db.execute("DELETE FROM portfolio WHERE user_id=? AND symbol=?;", (user, symbol))
+            db.commit()
+        else: 
+            db.commit()
+
+        # Insert transaction into ledger. 
+        db.execute("""INSERT INTO ledger (symbol, transaction_type, price, shares, datetime, user_id) 
+        VALUES (?, ?, ?, ?, ?, ?);""", (symbol, transaction_type, price, shares, date, user))
+        db.commit()
+
+        return redirect("/")
+    # GET requests to route
+    else: 
+        return render_template("sell.html")
 
 
 def errorhandler(e):
