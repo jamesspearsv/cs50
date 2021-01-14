@@ -136,7 +136,10 @@ def buy():
 @login_required
 def history():
     """Show history of transactions"""
-    return apology("TODO")
+    history = cursor.execute(""" SELECT ledger.symbol, stock_name, shares, price, datetime FROM ledger 
+    JOIN portfolio ON portfolio.symbol = ledger.symbol WHERE ledger.user_id=? ORDER BY ledger.id DESC;""", (session["user_id"], )).fetchall()
+    print(history)
+    return render_template("history.html", history=history)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -264,11 +267,12 @@ def sell():
         # Check that user has enough shares to make the sale
         if int(shares) > user_shares:
             return apology("Insufficient funds", 403)
+        shares = int(shares) * -1
                 
 
         # Update users cash account balance and portfolio
         # If user already owns desired stock.
-        db.execute("UPDATE portfolio SET total_shares=total_shares - ? WHERE user_id=? AND symbol=?;", (shares, user, symbol))
+        db.execute("UPDATE portfolio SET total_shares=total_shares + ? WHERE user_id=? AND symbol=?;", (shares, user, symbol))
         db.execute("UPDATE users SET cash=cash + ? WHERE id=?;", (cost, user))
 
         # Check that user has shares remaining after sale. If not, delete row.

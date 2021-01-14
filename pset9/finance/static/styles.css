@@ -99,3 +99,8 @@ main img
 .sell-form button {
     margin-top: 3%;
 }
+
+.history,
+.portfolio {
+    margin-top: 2%;
+}
