@@ -1,6 +1,5 @@
 import os
 
-
 from sqlite3 import *
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
@@ -39,6 +38,7 @@ Session(app)
 # Configure CS50 Library to use SQLite database (Reworked to use Python sqlite3 module)
 db = connect("finance.db")
 cursor = db.cursor()
+
 try:
     db.execute("""CREATE TABLE users (
                 id INTEGER,
@@ -50,12 +50,22 @@ try:
     db.execute("""CREATE TABLE portfolio (
                 symbol TEXT NOT NULL,
                 stock_name TEXT NOT NULL,
-                purchase_price NUMERIC NOT NULL,
-                purchase_datetime TEXT NOT NULL,
-                shares INTEGER,
+                total_shares INTEGER,
                 user_id INTEGER,
-                FOREIGN KEY(user_id) REFERENCES users(id)
-                );""")
+                PRIMARY KEY(symbol),
+                FOREIGN KEY(user_id) REFERENCES users(id));""")
+    db.execute("CREATE UNIQUE INDEX symbol ON portfolio(symbol);")
+    db.execute("""CREATE TABLE ledger (
+                id INTEGER,
+                symbol TEXT NOT NULL,
+                transaction_type TEXT NOT NULL,
+                price NUMERIC NOT NULL,
+                shares INTEGER,
+                datetime TEXT NOT NULL,
+                user_id INTEGER,
+                PRIMARY KEY(id),
+                FOREIGN KEY(symbol) REFERENCES portfolio(symbol),
+                FOREIGN KEY(user_id) REFERENCES users(id));""")
 except:
     pass
 
@@ -76,29 +86,48 @@ def index():
 def buy():
     """Buy shares of stock"""
     if request.method == "POST":
-        symbol = request.form.get("symbol")
-        shares = request.form.get("shares")
+        transaction_type = "buy"
 
-        quote = lookup(symbol)
+        # Get lookup information
+        quote = lookup(request.form.get("symbol"))
         if quote==None:
             return apology("Looks like nothing was found", 404)
 
+        # Store necessary information in variables
+        shares = request.form.get("shares")
         name = quote["name"]
         price = quote["price"]
         symbol = quote["symbol"]
-        date = datetime.now()
-        user_id = session["user_id"]
+        date = datetime.utcnow()
+        user = session["user_id"]
+        cost = price * float(shares)
 
-        print(f"symbol: {symbol}")
-        print(f"shares: {shares}")
-        print(f"datetime: {date}")
+        temp = cursor.execute("SELECT cash FROM users WHERE id=?;", (user,)).fetchall()
+        user_funds = temp[0][0]
 
-        """TODO: Finish collection necessary data and insert into databse"""
-        """TODO: Need new table to record transaction history"""
-        """TODO: Link all tables to session["user_id"]"""
+        # Check that user has funds to make purchase
+        if user_funds < cost:
+            return apology("Insufficient funds")
+                
+        # Insert transaction into ledger. TODO factor this out into function (helpers.py). Used later in sell route.
+        db.execute("""INSERT INTO ledger (symbol, transaction_type, price, shares, datetime, user_id) 
+        VALUES (?, ?, ?, ?, ?, ?);""", (symbol, transaction_type, price, shares, date, user))
+        db.commit()
 
-        return apology("TODO")
-    else:
+        # Update users cash account balance and total owned shares.
+        # Check is user does not already has desired stock
+        rows = cursor.execute("SELECT * from portfolio WHERE user_id=? AND symbol=?;", (user, symbol)).fetchall()
+        if len(rows) == 0:
+            db.execute("INSERT INTO portfolio (symbol, stock_name, total_shares, user_id) VALUES(?, ?, ?, ?);", (symbol, name, shares, user))
+            db.execute("UPDATE users SET cash=? WHERE id=?;", ((user_funds - cost), user))
+            db.commit()
+            return redirect("/")
+        # If user already has desired stock. TODO update cash balance and total owned shares. 
+        # Maybe factor this out into function (helpers.py) too. Similar action in sell route.
+        else: 
+            return apology("TODO: ELSE")
+    # GET requests to route
+    else: 
         return render_template("buy.html")
 
 @app.route("/history")
@@ -160,8 +189,9 @@ def logout():
 def quote():
     """Get stock quote."""
     if request.method == "POST":
-        symbol = request.form.get("symbol")
-        quote = lookup(symbol)
+        # Get needed lookup information from lookup()
+        quote = lookup(request.form.get("symbol"))
+        # If symbol provided is invalid
         if quote==None:
             return apology("Looks like nothing was found", 404)
         
@@ -170,6 +200,7 @@ def quote():
         price = usd(quote["price"])
         
         return render_template("quoted.html", name=name, price=price, symbol=symbol)
+    # GET requests to quote route
     else:
        return render_template("quote.html")
 
@@ -177,11 +208,11 @@ def quote():
 def register():
     """Register user"""
     if request.method == "POST":
+        # Get user input from registration form
         username = request.form.get("username")
         password = request.form.get("password")
         password_confirm = request.form.get("password_confirm")
 
-        rows = cursor.execute("SELECT username FROM users WHERE username=?;", (username,)).fetchall()
         # Check user provided username and password
         if username == None or password == None:
             return apology("Username or password not provided", 403)
@@ -189,6 +220,7 @@ def register():
         if password != password_confirm:
             return apology("Passwords do not match", 403)
         # Check username is available
+        rows = cursor.execute("SELECT username FROM users WHERE username=?;", (username,)).fetchall()
         if len(rows) >= 1:
             return apology("Username taken")
 
@@ -198,7 +230,7 @@ def register():
         db.execute("INSERT INTO users (username, hash) VALUES (?, ?);", (username, hashword))
         db.commit()
         return redirect("/")
-
+    # GET requests to route
     else:
         return render_template("register.html")
 
