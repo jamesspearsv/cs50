@@ -3,7 +3,9 @@
 
 #VS Code system specific files
 /listPractice/.vscode
+/pset9/finance/.vscode
 *.dSYM
 
 #Database files --> Too large for GitHub
 *.db
+

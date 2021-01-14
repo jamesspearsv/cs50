@@ -36,9 +36,9 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Configure CS50 Library to use SQLite database (Reworked to use Python sqlite3 module)
-db = connect("finance.db")
+db = connect("finance.db", check_same_thread=False)
 cursor = db.cursor()
-
+db.commit()
 try:
     db.execute("""CREATE TABLE users (
                 id INTEGER,
@@ -66,8 +66,9 @@ try:
                 PRIMARY KEY(id),
                 FOREIGN KEY(symbol) REFERENCES portfolio(symbol),
                 FOREIGN KEY(user_id) REFERENCES users(id));""")
+    db.commit()
 except:
-    pass
+    db.commit()
 
 # Make sure API key is set
 if not os.environ.get("API_KEY"):
@@ -156,7 +157,7 @@ def login():
             return apology("must provide password", 403)
 
         # Query database for username
-        rows = cursor.execute("SELECT * FROM users WHERE username = ?;", (request.form.get("username"),)).fetchall()
+        rows = cursor.execute("SELECT * FROM users WHERE username =?;", (request.form.get("username"),)).fetchall()
 
         # Ensure username exists and password is correct
         if len(rows) != 1 or not check_password_hash(rows[0][2], request.form.get("password")):
