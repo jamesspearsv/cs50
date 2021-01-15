@@ -78,7 +78,29 @@ if not os.environ.get("API_KEY"):
 @login_required
 def index():
     """Show portfolio of stocks"""
-    return render_template("index.html")
+    portfolio = []
+    temp_row = db.execute("SELECT cash FROM users WHERE id=?;", (session["user_id"],)).fetchall()
+    user_cash = float(temp_row[0][0])
+    portfolio_value = user_cash
+    
+    for row in db.execute("SELECT symbol, stock_name, total_shares FROM portfolio WHERE user_id=?;", (session["user_id"],)):
+        quote = lookup(row[0])
+        price = float(quote["price"])
+        value = price * float(row[2])
+        tempDict = {
+            'symbol' : row[0],
+            'stock_name' : row[1],
+            'total_shares' : row[2],
+            'current_price' : usd(price),
+            'value' : usd(value)
+        }
+        portfolio.append(tempDict)
+        portfolio_value = portfolio_value + value
+    
+    portfolio_value = usd(portfolio_value)
+    user_cash = usd(user_cash)
+
+    return render_template("index.html", portfolio=portfolio, user_cash=user_cash, portfolio_value=portfolio_value)
 
 
 @app.route("/buy", methods=["GET", "POST"])
@@ -136,8 +158,8 @@ def buy():
 @login_required
 def history():
     """Show history of transactions"""
-    history = cursor.execute(""" SELECT ledger.symbol, stock_name, shares, price, datetime FROM ledger 
-    JOIN portfolio ON portfolio.symbol = ledger.symbol WHERE ledger.user_id=? ORDER BY ledger.id DESC;""", (session["user_id"], )).fetchall()
+    history = cursor.execute(""" SELECT symbol, shares, price, datetime 
+    FROM ledger WHERE user_id=? ORDER by id DESC;""", (session["user_id"], )).fetchall()
     print(history)
     return render_template("history.html", history=history)
 

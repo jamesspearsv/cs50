@@ -73,14 +73,13 @@ main img
     flex: 1;
 }
 
-.buy-btn-lnk,
-.sell-btn-lnk {
+
+.btn-lnk {
     color: #ffffff;
     text-decoration: none;
 }
 
-.buy-btn-lnk:hover,
-.sell-btn-lnk:hover {
+.btn-lnk:hover {
     color: #ffffff;
     text-decoration: none;
 }
@@ -103,4 +102,8 @@ main img
 .history,
 .portfolio {
     margin-top: 2%;
+}
+
+#portfolio_value {
+    font-weight: bold;
 }

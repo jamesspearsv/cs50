@@ -5,23 +5,42 @@
 {% endblock %}
 
 {% block main %}
-    <h2>Portfolio</h2>
+    <h2>Your Portfolio</h2>
     <table class="table portfolio">
         <tr>
             <th>Symbol</th>
             <th>Name</th>
             <th>Shares</th>
-            <th>Price</th>
-            <th>Date</th>
+            <th>Current Price</th>
+            <th>Value</th>
         </tr>
-        {% for i in range(history | length) %}
+        {% for row in portfolio %}
             <tr>
-                <td>{{ history[i][0] }}</td>
-                <td>{{ history[i][1] }}</td>
-                <td>{{ history[i][2] }}</td>
-                <td>{{ history[i][3] }}</td>
-                <td>{{ history[i][4] }}</td>
+                <td>{{ row.symbol }}</td>
+                <td>{{ row.stock_name }}</td>
+                <td>{{ row.total_shares }}</td>
+                <td>{{ row.current_price }}</td>
+                <td>{{ row.value }}</td>
             </tr>
         {% endfor %}
+        <tr>
+            <td>Cash Balance</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>{{ user_cash }}</td>
+        </tr>
+        <tr>
+            <td>Portfolio Value</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td id="portfolio_value">{{ portfolio_value }}</td>
+        </tr>
     </table>
+
+    <div class="action_btns">
+        <button class="btn btn-primary"><a class="btn-lnk" href="/buy">Buy</a></button>
+        <button class="btn btn-primary"><a class="btn-lnk" href="/sell">Sell</a></button>
+    </div>
 {% endblock %}

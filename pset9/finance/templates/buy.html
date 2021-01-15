@@ -9,7 +9,7 @@
     <form action="/buy" method="post">
         <div class="form-group buy-form">
             <input name="symbol" type="text" placeholder="Symbol" autocomplete="off" autofocus>
-            <input name="shares" type="number" placeholder="Number of Shares">
+            <input name="shares" type="number" min="0" placeholder="Number of Shares">
             <button type="submit" class="btn btn-primary">Buy</button>
         </div>
     </form>
