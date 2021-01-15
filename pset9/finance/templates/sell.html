@@ -8,7 +8,10 @@
     <h2>Sell</h2>
     <form action="/sell" method="post">
         <div class="form-group sell-form">
-            <input name="symbol" type="text" placeholder="Symbol" autocomplete="off" autofocus>
+            <select name="symbol" type="text" placeholder="Symbol" autocomplete="off" autofocus>
+                {% for i in range(portfolio | length)  %}
+                    <option value="{{ portfolio[i][0] }}">{{ portfolio[i][0] }}</option>
+                {% endfor %}
             <input name="shares" type="number" min="0" placeholder="Number of Shares">
             <button type="submit" class="btn btn-primary">Sell</button>
         </div>

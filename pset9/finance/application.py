@@ -85,21 +85,18 @@ def index():
     
     for row in db.execute("SELECT symbol, stock_name, total_shares FROM portfolio WHERE user_id=?;", (session["user_id"],)):
         quote = lookup(row[0])
-        price = float(quote["price"])
-        value = price * float(row[2])
+        price = quote["price"]
+        stock_value = float(price) * float(row[2])
         tempDict = {
             'symbol' : row[0],
             'stock_name' : row[1],
             'total_shares' : row[2],
-            'current_price' : usd(price),
-            'value' : usd(value)
+            'current_price' : price,
+            'value' : stock_value
         }
         portfolio.append(tempDict)
-        portfolio_value = portfolio_value + value
+        portfolio_value = portfolio_value + stock_value
     
-    portfolio_value = usd(portfolio_value)
-    user_cash = usd(user_cash)
-
     return render_template("index.html", portfolio=portfolio, user_cash=user_cash, portfolio_value=portfolio_value)
 
 
@@ -113,10 +110,12 @@ def buy():
         # Get lookup information
         quote = lookup(request.form.get("symbol"))
         if quote==None:
-            return apology("Looks like nothing was found", 404)
+            return apology("Looks like nothing was found", code=400)
 
         # Store necessary information in variables
         shares = request.form.get("shares")
+        if not shares.isdigit():
+            return apology("Error", code=400)
         name = quote["name"]
         price = quote["price"]
         symbol = quote["symbol"]
@@ -127,9 +126,10 @@ def buy():
         temp = cursor.execute("SELECT cash FROM users WHERE id=?;", (user,)).fetchall()
         user_funds = temp[0][0]
 
+    
         # Check that user has funds to make purchase
         if cost > user_funds:
-            return apology("Insufficient funds", 403)
+            return apology("Insufficient funds", 400)
                 
 
         # Update users cash account balance and portfolio
@@ -220,7 +220,7 @@ def quote():
         quote = lookup(request.form.get("symbol"))
         # If symbol provided is invalid
         if quote==None:
-            return apology("Looks like nothing was found", 404)
+            return apology("Looks like nothing was found", code=400)
         
         name = quote["name"]
         symbol = quote["symbol"]
@@ -235,17 +235,19 @@ def quote():
 def register():
     """Register user"""
     if request.method == "POST":
+        # Validate form
+        if not request.form.get("username") or not request.form.get("password"):
+            return apology("Please provide a username and password", code=400)
+        
         # Get user input from registration form
         username = request.form.get("username")
         password = request.form.get("password")
-        password_confirm = request.form.get("password_confirm")
+        password_confirm = request.form.get("confirmation")
 
-        # Check user provided username and password
-        if username == None or password == None:
-            return apology("Username or password not provided", 403)
+
         # Check user confirmed password
         if password != password_confirm:
-            return apology("Passwords do not match", 403)
+            return apology("Passwords do not match", code=400)
         # Check username is available
         rows = cursor.execute("SELECT username FROM users WHERE username=?;", (username,)).fetchall()
         if len(rows) != 0:
@@ -269,13 +271,17 @@ def sell():
     if request.method == "POST":
         transaction_type = "sell"
 
+    
         # Get lookup information
         quote = lookup(request.form.get("symbol"))
         if quote==None:
-            return apology("Looks like nothing was found", 404)
+            return apology("Looks like nothing was found", 400)
+
+        shares = request.form.get("shares")
+        if not shares.isdigit(): 
+            return apology("Error", 400)
 
         # Store necessary information in variables
-        shares = request.form.get("shares")
         name = quote["name"]
         price = quote["price"]
         symbol = quote["symbol"]
@@ -286,9 +292,10 @@ def sell():
         temp = cursor.execute("SELECT total_shares FROM portfolio WHERE user_id=? AND symbol=?;", (user, symbol)).fetchall()
         user_shares = temp[0][0]
 
+        
         # Check that user has enough shares to make the sale
         if int(shares) > user_shares:
-            return apology("Insufficient funds", 403)
+            return apology("Insufficient funds", 400)
         shares = int(shares) * -1
                 
 
@@ -311,9 +318,11 @@ def sell():
         db.commit()
 
         return redirect("/")
-    # GET requests to route
+    # GET requests to sell route
     else: 
-        return render_template("sell.html")
+        # TODO get list of owned stock symbol
+        portfolio = db.execute("SELECT symbol FROM portfolio WHERE user_id=?;", (session["user_id"],)).fetchall()
+        return render_template("sell.html", portfolio=portfolio)
 
 
 def errorhandler(e):

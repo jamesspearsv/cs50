@@ -19,8 +19,8 @@
                 <td>{{ row.symbol }}</td>
                 <td>{{ row.stock_name }}</td>
                 <td>{{ row.total_shares }}</td>
-                <td>{{ row.current_price }}</td>
-                <td>{{ row.value }}</td>
+                <td>{{ row.current_price | usd }}</td>
+                <td>{{ row.value | usd }}</td>
             </tr>
         {% endfor %}
         <tr>
@@ -28,14 +28,14 @@
             <td></td>
             <td></td>
             <td></td>
-            <td>{{ user_cash }}</td>
+            <td>{{ user_cash | usd }}</td>
         </tr>
         <tr>
             <td>Portfolio Value</td>
             <td></td>
             <td></td>
             <td></td>
-            <td id="portfolio_value">{{ portfolio_value }}</td>
+            <td id="portfolio_value">{{ portfolio_value | usd }}</td>
         </tr>
     </table>
 
