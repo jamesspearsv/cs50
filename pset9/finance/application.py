@@ -1,7 +1,7 @@
 import os
 
 from sqlite3 import *
-from flask import Flask, flash, redirect, render_template, request, session
+from flask import Flask, flash, redirect, render_template, request, session, json, jsonify
 from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
@@ -149,6 +149,7 @@ def buy():
         VALUES (?, ?, ?, ?, ?, ?);""", (symbol, transaction_type, price, shares, date, user))
         db.commit()
 
+        flash(f"Bought {shares} share(s) of {name}")
         return redirect("/")
     # GET requests to route
     else: 
@@ -224,9 +225,14 @@ def quote():
         
         name = quote["name"]
         symbol = quote["symbol"]
-        price = usd(quote["price"])
+        price = quote["price"]
+
+        row = db.execute("SELECT cash FROM users WHERE id=?;", (session["user_id"],)).fetchall()
+        cash = row[0][0]
         
-        return render_template("quoted.html", name=name, price=price, symbol=symbol)
+
+        price_js = json.dumps( float(price) )
+        return render_template("quoted.html", name=name, price=price, symbol=symbol, cash=cash, price_js=price_js)
     # GET requests to quote route
     else:
        return render_template("quote.html")
@@ -317,12 +323,33 @@ def sell():
         VALUES (?, ?, ?, ?, ?, ?);""", (symbol, transaction_type, price, shares, date, user))
         db.commit()
 
+        flash(f"Sold {(shares * -1)} share(s) of {name}")
         return redirect("/")
     # GET requests to sell route
     else: 
         # TODO get list of owned stock symbol
         portfolio = db.execute("SELECT symbol FROM portfolio WHERE user_id=?;", (session["user_id"],)).fetchall()
         return render_template("sell.html", portfolio=portfolio)
+
+@app.route("/settings", methods=["GET", "POST"])
+@login_required
+def settings():
+    if request.method == "POST":
+        return apology("TODO: post")
+    else: 
+        return apology("TODO: get")
+
+@app.route("/username", methods=["GET"])
+def username():
+    q = request.args.get('q')
+    available = []
+    rows = db.execute("SELECT username FROM users WHERE username=?;", (q,)).fetchall()
+    if len(rows) == 0:
+        available.append('true')
+        return jsonify(available)
+    else:
+        available.append('false')
+        return jsonify(available)
 
 
 def errorhandler(e):

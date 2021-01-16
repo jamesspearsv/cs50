@@ -9,9 +9,23 @@
 {% block main %}
     <h2>{{ name }} ({{ symbol }})</h2>
     <div class="stock-quote">
-        <p>A share of {{ name }} ({{ symbol }}) costs {{ price }} .</p>
-        <button class="btn btn-primary"><a class="btn-lnk" href="/buy">Buy</a></button>
-        <button class="btn btn-primary"><a class="btn-lnk" href="/sell">Sell</a></button>
+        <p>A share of {{ name }} ({{ symbol }}) costs {{ price | usd }} .</p>
+    </div>
+    <form class="form-group" action="/buy" method="post">
+        <input name="shares" id="shares" type="number" min="1" placeholder="Shares" onchange="total(this.value)">
+        <input name="symbol"  type="hidden" value="{{ symbol }}">
+        <button type="submit" class="btn btn-primary">Buy</button>
+    </form>
+
+    <div class="buy-total">
+        <p>Cash Balance: {{ cash | usd }}</p>
+        <p id="total">Total: $0</p>
     </div>
 
+    <script>
+        function total(value) {
+            let price = JSON.parse({{ price_js | tojson }});
+            document.getElementById('total').innerHTML = "Total: $" + (price * value).toFixed(2);
+        };
+    </script>
 {% endblock %}

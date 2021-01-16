@@ -7,14 +7,87 @@
 {% block main %}
     <form action="/register" method="post">
         <div class="form-group">
-            <input autocomplete="off" autofocus class="form-control" name="username" placeholder="Username" type="text">
+            <input autocomplete="off" autofocus class="form-control"  id="username" name="username" placeholder="Username" type="text">
+            <p id="feedback"></p>
         </div>
         <div class="form-group">
-            <input class="form-control" name="password" placeholder="Password" type="password">
+            <input class="form-control" id ="password" name="password" placeholder="Password" type="password" minlength="6">
         </div>
         <div class="form_group">
-            <input class="form-control" name="confirmation" placeholder="Confirm Password" type="password">
+            <input class="form-control" id="confirmation" name="confirmation" placeholder="Confirm Password" type="password">
         </div>
-        <button class="btn btn-primary" id="register-btn" type="submit">Register</button>
+        <p class="requirements"><br>Password must be 6 characters long, contain 1 uppercase letter, 1 number, <br>and a special character (!, ?, _, $)</p>
+        <button disabled class="btn btn-primary" id="register-btn" type="submit">Register</button>
     </form>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" 
+    integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" 
+    crossorigin="anonymous">
+    </script>
+    <script>
+        let username = document.querySelector('#username');
+        let password = document.querySelector('#password');
+        let confirmation = document.querySelector('#confirmation'); 
+
+        let tracker = [false, false, false];
+
+        if (tracker[0] == true && tracker[1] == true && tracker[3] == true) {
+            document.getElementById('register-btn').removeAttribute('disabled');
+        }
+
+        username.addEventListener('keyup', () => {
+            $.get('/username?q=' + username.value, function(available) {
+                let feedback = document.getElementById('feedback');
+                if (available[0] == 'true') {
+                    feedback.innerHTML = 'Username is available!';
+                    tracker[0] = true
+                } else {
+                    feedback.innerHTML = 'Username unavailable';
+                    tracker[0] = false
+                }
+            });
+        });
+        
+        password.addEventListener('keyup', () => {
+            let upper = 0;
+            let digit = 0;
+            let special = 0;
+
+            value = password.value;
+
+            let specialChar = ['!', '?', "_", "$"];
+
+            for (let i = 0; i < value.length; i++) {
+                if (!) {
+                    digit += 1;
+                    console.log('Digit');
+                } 
+                if (value[i]) {
+                    upper += 1;
+                    console.log('Upper');
+                } 
+                if (value[i] in specialChar) {
+                    special =+ 1;
+                    console.log('Special');
+                }
+            }
+
+            console.log(digit, upper, special)
+
+            if (upper > 0 && digit > 0 && special > 0) {
+                tracker[1] = true;
+            } else {
+                tracker[1] = false;
+            }
+        });
+
+        confirmation.addEventListener('keyup', () => {
+            pvalue = password.value;
+            cvalue = confirmation.value;
+            if (cvalue == pvalue) {
+                tracker[2] = true;
+            } else {
+                tracker[2] = false;
+            }
+        });
+    </script>
 {% endblock %}
