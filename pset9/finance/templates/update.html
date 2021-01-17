@@ -1,0 +1,82 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Update
+{% endblock %}
+
+{% block main %}
+<h2>Update Your Password</h2>
+<div class="form-container">
+    <form action="/update" method="post">
+        <div class="form-group">
+            <input class="form-control" id ="password" name="password" placeholder="Password" type="password" minlength="6">
+        </div>
+        <div class="form_group">
+            <input class="form-control" id="confirmation" name="confirmation" placeholder="Confirm Password" type="password">
+        </div>
+        <p class="requirements"><br>Password must be 6 characters long, contain 1 uppercase letter, 1 number, <br>and a special character (! # $ % & ?)</p>
+        <button class="btn btn-primary" id="update-btn" type="submit" disabled>Update</button>
+    </form>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js" 
+integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" 
+crossorigin="anonymous">
+</script>
+<script>
+    let password = document.querySelector('#password');
+    let confirmation = document.querySelector('#confirmation');
+    let register_btn = document.querySelector('#update-btn');
+    
+    let tracker = [false, false];
+
+    function enableButton() {
+        if (tracker[0] && tracker[1]) {
+            document.getElementById('update-btn').disabled = false; 
+        } else {
+            document.getElementById('update-btn').disabled = true; 
+        }
+    }
+
+    password.addEventListener('keyup', () => {
+        let upper = 0;
+        let digit = 0;
+        let special = 0;
+
+        value = password.value;
+
+        const specialChar = '! # $ % & ?';
+
+        for (let i = 0; i < value.length; i++) {
+            if ($.isNumeric(value[i])) {
+                digit ++;
+            } 
+            if (value[i] >= 'A' && value[i] <= 'Z') {
+                upper ++;
+            } 
+            if (specialChar.includes(value[i])) {
+                special ++;
+            }
+        }
+
+        if (upper > 0 && digit > 0 && special > 0) {
+            tracker[0] = true;
+        } else {
+            tracker[0] = false;
+        }
+
+        enableButton();
+    });
+
+    confirmation.addEventListener('keyup', () => {
+        pvalue = password.value;
+        cvalue = confirmation.value;
+        if (cvalue == pvalue) {
+            tracker[1] = true;
+        } else {
+            tracker[1] = false;
+        }
+
+        enableButton();
+    });
+</script>
+{% endblock %}

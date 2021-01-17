@@ -83,6 +83,7 @@ def index():
     user_cash = float(temp_row[0][0])
     portfolio_value = user_cash
     
+    # Get data for table
     for row in db.execute("SELECT symbol, stock_name, total_shares FROM portfolio WHERE user_id=?;", (session["user_id"],)):
         quote = lookup(row[0])
         price = quote["price"]
@@ -94,6 +95,7 @@ def index():
             'current_price' : price,
             'value' : stock_value
         }
+        # Append data from database and lookup to Dict
         portfolio.append(tempDict)
         portfolio_value = portfolio_value + stock_value
     
@@ -159,9 +161,9 @@ def buy():
 @login_required
 def history():
     """Show history of transactions"""
+    # Gets transaction history from DB
     history = cursor.execute(""" SELECT symbol, shares, price, datetime 
     FROM ledger WHERE user_id=? ORDER by id DESC;""", (session["user_id"], )).fetchall()
-    print(history)
     return render_template("history.html", history=history)
 
 
@@ -227,6 +229,7 @@ def quote():
         symbol = quote["symbol"]
         price = quote["price"]
 
+        # Gets user cash balance
         row = db.execute("SELECT cash FROM users WHERE id=?;", (session["user_id"],)).fetchall()
         cash = row[0][0]
         
@@ -331,16 +334,16 @@ def sell():
         portfolio = db.execute("SELECT symbol FROM portfolio WHERE user_id=?;", (session["user_id"],)).fetchall()
         return render_template("sell.html", portfolio=portfolio)
 
-@app.route("/settings", methods=["GET", "POST"])
+@app.route("/settings")
 @login_required
 def settings():
-    if request.method == "POST":
-        return apology("TODO: post")
-    else: 
-        return apology("TODO: get")
+        # Grabs username to display on settings page
+        row = db.execute("SELECT username, hash FROM users WHERE id=?;", (session["user_id"],)).fetchall()
+        return render_template("settings.html", username=row[0][0])
 
 @app.route("/username", methods=["GET"])
 def username():
+    # Checks username availbility and returns to client
     q = request.args.get('q')
     available = []
     rows = db.execute("SELECT username FROM users WHERE username=?;", (q,)).fetchall()
@@ -351,6 +354,32 @@ def username():
         available.append('false')
         return jsonify(available)
 
+@app.route("/password", methods=["POST"])
+@login_required
+def password():
+    # Check that user inputs valid password when attempting to update it.
+    data = request.form['password']
+    result = []
+    row = db.execute("SELECT hash FROM users WHERE id=?;", (session["user_id"],)).fetchall()
+    if check_password_hash(row[0][0], data):
+        result.append('true')
+        return jsonify(result)
+    else:
+        result.append('false')
+        return jsonify(result)
+
+@app.route("/update", methods=["GET", "POST"])
+@login_required
+def update():
+    # inserts user's new password into database. 
+    if request.method == "POST":
+        password = request.form.get("password")
+        hashword = generate_password_hash(password)
+        db.execute("UPDATE users SET hash =? WHERE id=?;", (hashword, session["user_id"]))
+        flash("Password updated")
+        return redirect("/")
+    else:
+        return render_template("update.html")
 
 def errorhandler(e):
     """Handle error"""

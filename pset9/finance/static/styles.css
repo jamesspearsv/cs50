@@ -107,3 +107,8 @@ main img
 #portfolio_value {
     font-weight: bold;
 }
+
+#feedback {
+    margin-top: 1%;
+    margin-bottom: 0;
+}
