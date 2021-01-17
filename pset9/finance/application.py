@@ -89,11 +89,11 @@ def index():
         price = quote["price"]
         stock_value = float(price) * float(row[2])
         tempDict = {
-            'symbol' : row[0],
-            'stock_name' : row[1],
-            'total_shares' : row[2],
-            'current_price' : price,
-            'value' : stock_value
+            'symbol': row[0],
+            'stock_name': row[1],
+            'total_shares': row[2],
+            'current_price': price,
+            'value': stock_value
         }
         # Append data from database and lookup to Dict
         portfolio.append(tempDict)
@@ -117,7 +117,7 @@ def buy():
         # Store necessary information in variables
         shares = request.form.get("shares")
         if not shares.isdigit():
-            return apology("Error", code=400)
+            return apology("Please enter a number", code=400)
         name = quote["name"]
         price = quote["price"]
         symbol = quote["symbol"]
@@ -128,17 +128,16 @@ def buy():
         temp = cursor.execute("SELECT cash FROM users WHERE id=?;", (user,)).fetchall()
         user_funds = temp[0][0]
 
-    
         # Check that user has funds to make purchase
         if cost > user_funds:
             return apology("Insufficient funds", 400)
                 
-
         # Update users cash account balance and portfolio
         # Check is user does not already own desired stock
         rows = cursor.execute("SELECT * from portfolio WHERE user_id=? AND symbol=?;", (user, symbol)).fetchall()
         if len(rows) == 0:
-            db.execute("INSERT INTO portfolio (symbol, stock_name, total_shares, user_id) VALUES(?, ?, ?, ?);", (symbol, name, shares, user))
+            db.execute("INSERT INTO portfolio (symbol, stock_name, total_shares, user_id) VALUES(?, ?, ?, ?);", 
+                (symbol, name, shares, user))
             db.execute("UPDATE users SET cash=cash - ? WHERE id=?;", (cost, user))
             db.commit()
         else:
@@ -233,12 +232,12 @@ def quote():
         row = db.execute("SELECT cash FROM users WHERE id=?;", (session["user_id"],)).fetchall()
         cash = row[0][0]
         
-
         price_js = json.dumps( float(price) )
         return render_template("quoted.html", name=name, price=price, symbol=symbol, cash=cash, price_js=price_js)
     # GET requests to quote route
     else:
        return render_template("quote.html")
+
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -252,7 +251,6 @@ def register():
         username = request.form.get("username")
         password = request.form.get("password")
         password_confirm = request.form.get("confirmation")
-
 
         # Check user confirmed password
         if password != password_confirm:
@@ -279,8 +277,7 @@ def sell():
     """Sell shares of stock"""
     if request.method == "POST":
         transaction_type = "sell"
-
-    
+   
         # Get lookup information
         quote = lookup(request.form.get("symbol"))
         if quote==None:
@@ -300,14 +297,12 @@ def sell():
 
         temp = cursor.execute("SELECT total_shares FROM portfolio WHERE user_id=? AND symbol=?;", (user, symbol)).fetchall()
         user_shares = temp[0][0]
-
-        
+      
         # Check that user has enough shares to make the sale
         if int(shares) > user_shares:
             return apology("Insufficient funds", 400)
         shares = int(shares) * -1
                 
-
         # Update users cash account balance and portfolio
         # If user already owns desired stock.
         db.execute("UPDATE portfolio SET total_shares=total_shares + ? WHERE user_id=? AND symbol=?;", (shares, user, symbol))
@@ -334,12 +329,14 @@ def sell():
         portfolio = db.execute("SELECT symbol FROM portfolio WHERE user_id=?;", (session["user_id"],)).fetchall()
         return render_template("sell.html", portfolio=portfolio)
 
+
 @app.route("/settings")
 @login_required
 def settings():
         # Grabs username to display on settings page
         row = db.execute("SELECT username, hash FROM users WHERE id=?;", (session["user_id"],)).fetchall()
         return render_template("settings.html", username=row[0][0])
+
 
 @app.route("/username", methods=["GET"])
 def username():
@@ -353,6 +350,7 @@ def username():
     else:
         available.append('false')
         return jsonify(available)
+
 
 @app.route("/password", methods=["POST"])
 @login_required
@@ -368,6 +366,7 @@ def password():
         result.append('false')
         return jsonify(result)
 
+
 @app.route("/update", methods=["GET", "POST"])
 @login_required
 def update():
@@ -380,6 +379,7 @@ def update():
         return redirect("/")
     else:
         return render_template("update.html")
+
 
 def errorhandler(e):
     """Handle error"""
